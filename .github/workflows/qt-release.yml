@@ -70,6 +70,7 @@ jobs:
         chmod a+x linuxdeployqt.AppImage
         
         mkdir -p appdir/usr/bin
+        mkdir -p appdir/usr/share/applications
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
         cp Terminal appdir/usr/bin/
