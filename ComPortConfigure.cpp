@@ -132,13 +132,13 @@ void ComPortConfigure::portBaudSetting()
         port->setBaudRate(QSerialPort::Baud115200);
         break;
     case 8:
-        port->setBaudRate(QSerialPort::Baud230400);
+        port->setBaudRate(230400);
         break;
     case 9:
-        port->setBaudRate(QSerialPort::Baud460800);
+        port->setBaudRate(460800);
         break;
     case 10:
-        port->setBaudRate(QSerialPort::Baud921600);
+        port->setBaudRate(921600);
         break;
     }
 }
