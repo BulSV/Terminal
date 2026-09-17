@@ -204,11 +204,11 @@ void Macros::moveMacro(Macro *macro, MacrosMoveDirection direction)
         return;
     }
 
-    if(direction == MacrosMoveDirection::Up && macroIndex > 0) {
+    if(direction == MacrosMoveDirection::MoveUp && macroIndex > 0) {
         macros.swapItemsAt(macroIndex, macroIndex - 1);
         scrollAreaLayout->removeWidget(macro);
         scrollAreaLayout->insertWidget(macroIndex - 1, macro);
-    } else if(direction == MacrosMoveDirection::Down && macroIndex < macros.count() - 1) {
+    } else if(direction == MacrosMoveDirection::MoveDown && macroIndex < macros.count() - 1) {
         macros.swapItemsAt(macroIndex, macroIndex + 1);
         scrollAreaLayout->removeWidget(macro);
         scrollAreaLayout->insertWidget(macroIndex + 1, macro);
