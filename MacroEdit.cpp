@@ -4,7 +4,8 @@
 #include <QScrollBar>
 #include <QGridLayout>
 #include <QIntValidator>
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QtMath>
 #include <QFileInfo>
 
