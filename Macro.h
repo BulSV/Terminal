@@ -37,6 +37,8 @@ public:
     int getTime() const;
 
     const QByteArray &getPacket() const;
+    void sendPacket();
+
     void openMacroFile(const QString &fileName);
 signals:
     void deleted();
@@ -58,7 +60,6 @@ private:
     void view();
     void connections();
     void deleteMacro();
-    void sendPacket();
     void titleChanged();
     void selectTrigger();
     void onPacketChanged();
