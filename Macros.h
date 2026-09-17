@@ -69,7 +69,7 @@ private:
     void blockForMultiSend(bool block);
     void calculateMultiSendCeiledTime();
     void cycleSingleSendMode();
-    void setSelectedMacrosTime();
+    void setSelectedMacrosTime(int time);
 };
 
 #endif // MACROS_H
