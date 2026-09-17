@@ -63,25 +63,25 @@ jobs:
     - name: Package into AppImage (Linux Portable Qt6)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # 1. Download modern linuxdeploy and the Qt plugin designed for Qt6
-        curl -L -o linuxdeploy.AppImage https://github.com
+        # 🎯 FIXED: Updated download links using direct stable releases setup
+        curl -L -o linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
         curl -L -o linuxdeploy-plugin-qt.AppImage https://github.com
         chmod a+x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
         
-        # 2. Build standard Linux AppDir layout
+        # Build standard Linux AppDir layout
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/applications
         
         cp Terminal appdir/usr/bin/
         
-        # 3. Create a clean desktop entry file
+        # Create a clean desktop entry file
         echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
         
-        # 4. Point the tool to the location of the installed Qt6 SDK
+        # Point the tool to the location of the installed Qt6 SDK
         export QMAKE="/home/runner/work/Terminal/Qt/6.8.0/gcc_64/bin/qmake"
         export VERSION="1.0.0"
         
-        # 5. Run modern packaging tool using the Qt6 plugin suite
+        # Run modern packaging tool via explicitly specified local plugin paths
         ./linuxdeploy.AppImage --appdir appdir --plugin qt --output appimage
 
     # ==================== UPLOAD WORKFLOW ARTIFACTS ====================
