@@ -606,10 +606,10 @@ QString MainWindow::baudToString(int baud)
     case QSerialPort::Baud115200:
         baudString = "115200";
         break;
-    case QSerialPort::Baud230400:
+    case 230400:
         baudString = "230400";
         break;
-    case QSerialPort::Baud460800:
+    case 460800:
         baudString = "460800";
         break;
     default:
