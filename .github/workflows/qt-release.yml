@@ -63,24 +63,31 @@ jobs:
     - name: Package into AppImage (Linux Portable Qt6)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # Build standard Linux AppDir layout
+        # 1. Build standard Linux AppDir layout
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/applications
         
         cp Terminal appdir/usr/bin/
         
-        # Create a clean desktop entry file
+        # 2. Create a clean desktop entry file
         echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
         
-        # Point the tool to the location of the installed Qt6 SDK
+        # 3. Assemble and download the link safely using piece-by-piece string parts
+        # This completely avoids chat text truncation bugs
+        PART1="https://github.com"
+        PART2="/linuxdeploy/linuxdeploy/releases/download/continuous"
+        FILE="linuxdeploy-x86_64.AppImage"
+        
+        FULL_URL="${PART1}${PART2}/${FILE}"
+        
+        curl -L -o linuxdeploy-x86_64.AppImage "$FULL_URL"
+        chmod a+x linuxdeploy-x86_64.AppImage
+        
+        # 4. Point the tool to the location of the installed Qt6 SDK
         export QMAKE="/home/runner/work/Terminal/Qt/6.8.0/gcc_64/bin/qmake"
         export VERSION="1.0.0"
         
-        # Download official standalone linuxdeploy package securely via wget
-        wget -nv https://github.com
-        chmod a+x linuxdeploy-x86_64.AppImage
-        
-        # Run packaging without buggy external plugins using standard environment
+        # 5. Pack everything using standalone core runner
         ./linuxdeploy-x86_64.AppImage --appdir appdir --output appimage
 
     # ==================== UPLOAD WORKFLOW ARTIFACTS ====================
