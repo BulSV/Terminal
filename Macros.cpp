@@ -274,3 +274,86 @@ void Macros::setSelectedMacrosTime(int time)
         }
     }
 }
+void Macros::blockForMultiSend(bool block)
+{
+    actionDelete->setEnabled(!block);
+    actionSelectMacros->setEnabled(!block);
+    actionDeselectMacros->setEnabled(!block);
+    spinBoxTime->setEnabled(!block);
+    actionNew->setEnabled(!block);
+    actionLoad->setEnabled(!block);
+    actionSendMode->setEnabled(!block);
+    
+    QListIterator<Macro*> it(macros);
+    while(it.hasNext()) {
+        it.next()->enableSelectState(!block);
+    }
+}
+
+void Macros::loadMacros()
+{
+    if(fileDialog->exec() == QDialog::Accepted) {
+        QStringList fileNames = fileDialog->selectedFiles();
+        for(int i = 0; i < fileNames.count(); ++i) {
+            addMacro();
+            macros.last()->openMacroFile(fileNames.at(i));
+        }
+    }
+}
+
+void Macros::startOrStop()
+{
+    if(actionStartStop->toolTip() == tr("Start sending macros")) {
+        if(indexesOfIntervals.isEmpty()) {
+            QMessageBox::information(this, tr("Information"), tr("No macros selected"));
+            return;
+        }
+        actionStartStop->setIcon(QIcon(":/Resources/Stop.png"));
+        actionStartStop->setToolTip(tr("Stop sending macros"));
+        actionPause->setEnabled(true);
+        blockForMultiSend(true);
+        sendNextMacro();
+    } else {
+        setWorkState(true);
+    }
+}
+
+void Macros::pause(bool paused)
+{
+    if(paused) {
+        actionPause->setIcon(QIcon(":/Resources/Play.png"));
+        actionPause->setToolTip(tr("Resume sending macros"));
+        intervalTimer->stop();
+    } else {
+        actionPause->setIcon(QIcon(":/Resources/Pause.png"));
+        actionPause->setToolTip(tr("Pause sending macros"));
+        sendNextMacro();
+    }
+}
+
+void Macros::cycleSingleSendMode()
+{
+    if(actionSendMode->toolTip() == tr("Single shot sending mode")) {
+        actionSendMode->setIcon(QIcon(":/Resources/Cycle.png"));
+        actionSendMode->setToolTip(tr("Cycle sending mode"));
+    } else {
+        actionSendMode->setIcon(QIcon(":/Resources/SingleShot.png"));
+        actionSendMode->setToolTip(tr("Single shot sending mode"));
+    }
+}
+
+void Macros::sendNextMacro()
+{
+    if(currentIntervalIndex >= indexesOfIntervals.count()) {
+        currentIntervalIndex = 0;
+        if(actionSendMode->toolTip() == tr("Single shot sending mode")) {
+            setWorkState(true);
+            return;
+        }
+    }
+    
+    int macroIndex = indexesOfIntervals.at(currentIntervalIndex);
+    macros.at(macroIndex)->sendPacket();
+    intervalTimer->start(macros.at(macroIndex)->getTime());
+    currentIntervalIndex++;
+}
