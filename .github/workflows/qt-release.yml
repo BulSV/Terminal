@@ -1,4 +1,4 @@
-name: Qt5 Portable Build & Release
+name: Qt6 Portable Build & Release
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            qt-arch: win64_msvc2019_64
+            qt-arch: win64_msvc2022_64 # Updated to modern Visual Studio 2022 compiler
           - os: ubuntu-22.04
             qt-arch: gcc_64
     runs-on: ${{ matrix.os }}
@@ -21,10 +21,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Install Qt 5
+    # 1. SWITCHED TO QT 6.8 LTS
+    - name: Install Qt 6
       uses: jurplel/install-qt-action@v3
       with:
-        version: '5.15.2'
+        version: '6.8.0' # Uses official stable Qt6 standard
         arch: ${{ matrix.qt-arch }}
 
     # ==================== WINDOWS BUILD & DEPLOYMENT ====================
@@ -67,7 +68,6 @@ jobs:
         curl -L -o linuxdeployqt.AppImage "${URL_HOST}${URL_PATH}"
         chmod a+x linuxdeployqt.AppImage
         
-        # Structure the AppDir
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
