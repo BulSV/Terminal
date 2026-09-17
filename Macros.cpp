@@ -242,3 +242,35 @@ void Macros::deleteMacros()
         }
     }
 }
+
+void Macros::calculateMultiSendCeiledTime()
+{
+    int ceiledTime = 0;
+    for(int i = 0; i < indexesOfIntervals.count(); ++i) {
+        ceiledTime += macros.at(indexesOfIntervals.at(i))->getTime();
+    }
+    if(ceiledTime == 0) {
+        multiSentTime->setText(MULTI_SEND_TIME.arg("None"));
+    } else {
+        multiSentTime->setText(MULTI_SEND_TIME.arg(QString::number(ceiledTime)));
+    }
+}
+
+void Macros::moveMacroUp()
+{
+    moveMacro(qobject_cast<Macro*>(sender()), MoveUp);
+}
+
+void Macros::moveMacroDown()
+{
+    moveMacro(qobject_cast<Macro*>(sender()), MoveDown);
+}
+
+void Macros::setSelectedMacrosTime(int time)
+{
+    for(int i = 0; i < macros.count(); ++i) {
+        if(macros.at(i)->selectState()) {
+            macros.at(i)->setTime(time);
+        }
+    }
+}
