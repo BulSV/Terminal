@@ -9,25 +9,25 @@ jobs:
   build:
     name: Build for ${{ matrix.os }}
     strategy:
+      fail-fast: false # Prevents failing one OS from cancelling the other
       matrix:
         include:
           - os: windows-latest
             qt-arch: win64_msvc2022_64
           - os: ubuntu-22.04
-            qt-arch: linux_gcc_64 #Updated from gcc_64 to linux_gcc_64 for Qt 6.8+
+            qt-arch: linux_gcc_64
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Install Qt framework using the community action
     - name: Install Qt 6
       uses: jurplel/install-qt-action@v3
       with:
         version: '6.8.0'
         arch: ${{ matrix.qt-arch }}
-        modules: qtserialport #Tells the runner to explicitly download the serial port library
+        modules: qtserialport
 
     # ==================== WINDOWS BUILD & DEPLOYMENT ====================
     - name: Set up MSVC Developer Command Prompt
@@ -60,26 +60,29 @@ jobs:
         qmake Terminal.pro
         make
 
-    - name: Package into AppImage (Linux Portable)
+    - name: Package into AppImage (Linux Portable Qt6)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # Download linuxdeployqt using safe variable split to prevent text truncation bugs
-        URL_HOST="https://github.com"
-        URL_PATH="/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        curl -L -o linuxdeployqt.AppImage "${URL_HOST}${URL_PATH}"
-        chmod a+x linuxdeployqt.AppImage
+        # 1. Download modern linuxdeploy and the Qt plugin designed for Qt6
+        curl -L -o linuxdeploy.AppImage https://github.com
+        curl -L -o linuxdeploy-plugin-qt.AppImage https://github.com
+        chmod a+x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
         
+        # 2. Build standard Linux AppDir layout
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/applications
-        mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
         cp Terminal appdir/usr/bin/
         
-        echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nIcon=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
-        touch appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png
+        # 3. Create a clean desktop entry file
+        echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
         
+        # 4. Point the tool to the location of the installed Qt6 SDK
+        export QMAKE="/home/runner/work/Terminal/Qt/6.8.0/gcc_64/bin/qmake"
         export VERSION="1.0.0"
-        ./linuxdeployqt.AppImage appdir/usr/share/applications/Terminal.desktop -appimage -unsupported-allow-new-glibc
+        
+        # 5. Run modern packaging tool using the Qt6 plugin suite
+        ./linuxdeploy.AppImage --appdir appdir --plugin qt --output appimage
 
     # ==================== UPLOAD WORKFLOW ARTIFACTS ====================
     - name: Upload build artifacts
