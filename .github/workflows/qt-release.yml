@@ -34,7 +34,7 @@ jobs:
       shell: cmd
       run: |
         call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        qmake myproject.pro
+        qmake Terminal.pro
         nmake release
 
     - name: Deploy Qt dependencies (Windows Portable)
@@ -42,16 +42,16 @@ jobs:
       shell: pwsh
       run: |
         mkdir dist
-        copy release\myproject.exe dist\
-        windeployqt dist\myproject.exe
-        Compress-Archive -Path dist\* -DestinationPath myproject-windows-portable.zip
+        copy release\Terminal.exe dist\
+        windeployqt dist\Terminal.exe
+        Compress-Archive -Path dist\* -DestinationPath Terminal-windows-portable.zip
 
     # ==================== LINUX BUILD & DEPLOYMENT ====================
     - name: Compile project (Linux)
       if: matrix.os == 'ubuntu-22.04'
       run: |
         sudo apt-get update && sudo apt-get install -y build-essential libgl1-mesa-dev
-        qmake myproject.pro
+        qmake Terminal.pro
         make
 
     - name: Package into AppImage (Linux Portable)
@@ -65,15 +65,15 @@ jobs:
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
-        cp myproject appdir/usr/bin/
+        cp Terminal appdir/usr/bin/
         
         # Create a minimal required .desktop entry file
-        echo -e "[Desktop Entry]\nType=Application\nName=My Qt Application\nExec=myproject\nIcon=myproject\nCategories=Utility;" > appdir/usr/share/applications/myproject.desktop
-        touch appdir/usr/share/icons/hicolor/256x256/apps/myproject.png
+        echo -e "[Desktop Entry]\nType=Application\nName=My Qt Application\nExec=Terminal\nIcon=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
+        touch appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png
         
         # Bundle everything into a single executable binary
         export VERSION="1.0.0"
-        ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/myproject.desktop -appimage -unsupported-allow-new-glibc
+        ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/Terminal.desktop -appimage -unsupported-allow-new-glibc
 
     # ==================== UPLOAD WORKFLOW ARTIFACTS ====================
     - name: Upload build artifacts
