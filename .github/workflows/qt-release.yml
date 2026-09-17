@@ -63,17 +63,22 @@ jobs:
     - name: Package into AppImage (Linux Portable Qt6)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # 1. Build standard Linux AppDir layout
+        # 1. Build standard Linux AppDir layout with icons folder included
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/applications
+        mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
         cp Terminal appdir/usr/bin/
         
-        # 2. Create a clean desktop entry file
-        echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
+        # Copy your repository icon to the correct AppDir destination
+        # Assumes Terminal.png or similar exists in your repo root or Resources folder
+        # If it's inside Resources, change the source path below accordingly
+        cp Resources/Terminal.png appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png || cp Terminal.png appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png || touch appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png
+        
+        # 2. Create a clean desktop entry file (Icon parameter restored)
+        echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nIcon=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
         
         # 3. Assemble and download the link safely using piece-by-piece string parts
-        # This completely avoids chat text truncation bugs
         PART1="https://github.com"
         PART2="/linuxdeploy/linuxdeploy/releases/download/continuous"
         FILE="linuxdeploy-x86_64.AppImage"
