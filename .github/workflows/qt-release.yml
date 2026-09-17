@@ -63,11 +63,6 @@ jobs:
     - name: Package into AppImage (Linux Portable Qt6)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # 🎯 FIXED: Updated download links using direct stable releases setup
-        curl -L -o linuxdeploy.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-        curl -L -o linuxdeploy-plugin-qt.AppImage https://github.com
-        chmod a+x linuxdeploy.AppImage linuxdeploy-plugin-qt.AppImage
-        
         # Build standard Linux AppDir layout
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/applications
@@ -81,8 +76,12 @@ jobs:
         export QMAKE="/home/runner/work/Terminal/Qt/6.8.0/gcc_64/bin/qmake"
         export VERSION="1.0.0"
         
-        # Run modern packaging tool via explicitly specified local plugin paths
-        ./linuxdeploy.AppImage --appdir appdir --plugin qt --output appimage
+        # Download official standalone linuxdeploy package securely via wget
+        wget -nv https://github.com
+        chmod a+x linuxdeploy-x86_64.AppImage
+        
+        # Run packaging without buggy external plugins using standard environment
+        ./linuxdeploy-x86_64.AppImage --appdir appdir --output appimage
 
     # ==================== UPLOAD WORKFLOW ARTIFACTS ====================
     - name: Upload build artifacts
