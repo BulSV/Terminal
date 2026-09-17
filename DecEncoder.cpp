@@ -4,7 +4,7 @@ void DecEncoder::setData(const QString &data, const QString &sep)
 {
     DataEncoder::setData(data, sep);
 
-    QStringList byteList = data.split(sep, QString::SkipEmptyParts);
+    QStringList byteList = data.split(sep, Qt::SkipEmptyParts);
     int count = byteList.size();
     for(int i = 0; i < count; i++) {
         bool ok;
