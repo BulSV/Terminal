@@ -2,8 +2,8 @@ name: Qt5 Portable Build & Release
 
 on:
   push:
-    tags:
-      - 'v*' # Triggers the workflow only when a new version tag (e.g., v1.0.0) is pushed
+    branches:
+      - '*' # 🎯 Triggers automatically on any push to any branch (perfect for testing right now!)
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
         include:
           - os: windows-latest
             qt-arch: win64_msvc2019_64
-          - os: ubuntu-22.04 # Older Ubuntu version provides better glibc compatibility for AppImage
+          - os: ubuntu-22.04
             qt-arch: gcc_64
     runs-on: ${{ matrix.os }}
 
@@ -21,7 +21,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Install Qt framework using the community action
     - name: Install Qt 5
       uses: jurplel/install-qt-action@v3
       with:
@@ -57,21 +56,17 @@ jobs:
     - name: Package into AppImage (Linux Portable)
       if: matrix.os == 'ubuntu-22.04'
       run: |
-        # Download the official linuxdeployqt tool
         wget -c -nv "https://github.com"
         chmod a+x linuxdeployqt-continuous-x86_64.AppImage
         
-        # Structure the AppDir according to Linux desktop standards
         mkdir -p appdir/usr/bin
         mkdir -p appdir/usr/share/icons/hicolor/256x256/apps
         
         cp Terminal appdir/usr/bin/
         
-        # Create a minimal required .desktop entry file
-        echo -e "[Desktop Entry]\nType=Application\nName=My Qt Application\nExec=Terminal\nIcon=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
+        echo -e "[Desktop Entry]\nType=Application\nName=Terminal\nExec=Terminal\nIcon=Terminal\nCategories=Utility;" > appdir/usr/share/applications/Terminal.desktop
         touch appdir/usr/share/icons/hicolor/256x256/apps/Terminal.png
         
-        # Bundle everything into a single executable binary
         export VERSION="1.0.0"
         ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/Terminal.desktop -appimage -unsupported-allow-new-glibc
 
@@ -83,24 +78,3 @@ jobs:
         path: |
           *.zip
           *.AppImage
-
-  # ==================== CREATE GITHUB RELEASE ====================
-  create-release:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write # Essential permission to allow the bot to create a release page
-    steps:
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-
-    - name: Create GitHub Release and attach binaries
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          artifacts/release-windows-latest/*.zip
-          artifacts/release-ubuntu-22.04/*.AppImage
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
