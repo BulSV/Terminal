@@ -12,9 +12,9 @@ jobs:
       matrix:
         include:
           - os: windows-latest
-            qt-arch: win64_msvc2022_64 # Updated to modern Visual Studio 2022 compiler
+            qt-arch: win64_msvc2022_64
           - os: ubuntu-22.04
-            qt-arch: gcc_64
+            qt-arch: linux_gcc_64 #Updated from gcc_64 to linux_gcc_64 for Qt 6.8+
     runs-on: ${{ matrix.os }}
 
     steps:
