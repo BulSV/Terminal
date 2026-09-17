@@ -58,10 +58,10 @@ jobs:
         qmake Terminal.pro
         make
 
-    # This replaces the broken wget command with an official pre-built tool injector
-    - name: Set up linuxdeployqt
+    # Uses the official verified Marketplace action to safely fetch linuxdeployqt
+    - name: Install LinuxDeployQt
       if: matrix.os == 'ubuntu-22.04'
-      uses: meetality/setup-linuxdeployqt@v1
+      uses: miurahr/install-linuxdeployqt-action@v0
 
     - name: Package into AppImage (Linux Portable)
       if: matrix.os == 'ubuntu-22.04'
