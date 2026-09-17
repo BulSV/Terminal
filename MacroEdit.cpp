@@ -61,8 +61,8 @@ MacroEdit::MacroEdit(QWidget *parent)
 
     tableAscii->setMouseSelectEnable(false);
     tableAscii->setDataAlignment(Qt::AlignLeft);
-    tableAscii->setValidator(new QRegExpValidator(QRegExp(".{0,8}"), this));
-    tableHex->setValidator(new QRegExpValidator(QRegExp("([0-9]|[a-f]|[A-F]){1,2}"), this));
+    tableAscii->setValidator(new QRegularExpressionValidator(QRegularExpression(".{0,8}"), this));
+    tableHex->setValidator(new QRegularExpressionValidator(QRegularExpression("([0-9]|[a-f]|[A-F]){1,2}"), this));
     tableDec->setValidator(new QIntValidator(0, 255, this));
 
     tableAscii->setFixedWidth(TABLE_WIDTH);
